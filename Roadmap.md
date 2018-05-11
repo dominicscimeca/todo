@@ -4,6 +4,7 @@
 
 ### Stories (in priority)
 1. **[In Progress]** User Service get by user by Id (Zero feature story)
+    1. User -> full_name, first_name, last_name, id
 1. Front end displays user details by Id (zero feature story)
 1. Login
     1. As: a customer 
