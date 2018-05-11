@@ -11,24 +11,40 @@ class AppTest extends FunSpec with Matchers {
 
   def assertIsJSON(result: String): Unit = if (false) throw new RuntimeException("Is not JSON")
 
+  def generateUserGetByIdReqResp(id: Integer): RequestStub = {
+    val id = 1
+    val path = "/users/%d".format(id)
+    return new RequestStub(path)
+  }
+
   describe("App") {
     //given
     val app = new App()
 
     describe("getUserById") {
-      //given
-      val id = 1
-      val path = "/users/%d".format(id)
-      val req = new RequestStub(path)
-      var writer = new StringWriter()
-      val resp = new ResponseStub(writer)
+      describe("bob smith") {
+        val req = new RequestStub("/users/1")
+        val resp = new ResponseStub()
 
-      //when
-      app.service(req, resp)
-      val result: String = resp.getBodyInString
+        //when
+        app.service(req, resp)
+        val result: String = resp.getBodyInString
 
-      it("should return correct JSON as string") {
-        result should equal("""{id:1,"firstname":"Bob","lastname":"Smith","fullname":"Bob Smith"}""")
+        it("should return correct JSON as string") {
+          result should equal("""{id:1,"firstname":"Bob","lastname":"Smith","fullname":"Bob Smith"}""")
+        }
+      }
+      describe("john doe smith") {
+        val req = new RequestStub("/users/2")
+        val resp = new ResponseStub()
+
+        //when
+        app.service(req, resp)
+        val result: String = resp.getBodyInString
+
+        it("should return correct JSON as string") {
+          result should equal("""{id:2,"firstname":"John","lastname":"Doe","fullname":"John Doe"}""")
+        }
       }
     }
   }
@@ -37,7 +53,8 @@ class AppTest extends FunSpec with Matchers {
     override def getPathInfo: String = path
   }
 
-  class ResponseStub(stringWriter: StringWriter) extends HttpServletResponseImplAbstract {
+  class ResponseStub extends HttpServletResponseImplAbstract {
+    val stringWriter: StringWriter = new StringWriter()
     val printWriter: PrintWriter = new PrintWriter(stringWriter)
 
     def getBodyInString: String = stringWriter.getBuffer.toString

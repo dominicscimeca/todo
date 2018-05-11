@@ -11,10 +11,27 @@ import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
  */
 class App extends HttpServlet
 {
+    private val users = Map(
+        1 -> User(1, "Bob", "Smith"),
+        2 -> User(2, "John", "Doe")
+    )
+
+    def getIdFromPath(path: String): Integer = Integer.valueOf(path.split("/").last)
+
     @throws(classOf[ServletException])
     @throws(classOf[IOException])
     override protected def service(req: HttpServletRequest, resp: HttpServletResponse): Unit = {
-        resp.getWriter.print("""{id:1,"firstname":"Bob","lastname":"Smith","fullname":"Bob Smith"}""")
+        var path = req.getPathInfo
+        val id = getIdFromPath(path)
+        val userOption: Option[User] = users.get(id)
+        if(userOption.isEmpty) {
+            throw new RuntimeException("no User by that Id")
+        }else{
+            val user:User = userOption.get
+            resp.getWriter.print(s"""{id:${user.id},"firstname":"${user.firstName}","lastname":"${user.lastName}","fullname":"${user.firstName} ${user.lastName}"}""")
+        }
 //        super.service(req, resp);
     }
+
+    case class User(id: Integer, firstName: String, lastName: String){}
 }
