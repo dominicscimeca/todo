@@ -5,6 +5,10 @@ import java.io.IOException
 import javax.servlet.ServletException
 import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 
+import scala.collection.mutable
+import scala.util.matching.Regex
+import scala.collection.mutable.ListBuffer
+
 /**
  * Hello world!
  *
@@ -27,26 +31,32 @@ class App extends HttpServlet
     }
 
     trait Handler{
-        def canHandle(request: HttpServletRequest): Boolean
         def handle(request: HttpServletRequest, response: HttpServletResponse): Unit
+        def getPathRegex: Regex
+
+        def canHandle(request: HttpServletRequest): Boolean = {
+            val path = request.getPathInfo
+            pathMatchesPathRegex(path)
+        }
+
+        def pathMatchesPathRegex(path: String): Boolean = getPathRegex.findAllIn(path).hasNext
+        def getPathParams(path: String): List[String] = {
+            var params = new ListBuffer[String]()
+            getPathRegex.findAllIn(path).matchData foreach {
+                m => params += m.group(1)
+            }
+
+            params.toList
+        }
     }
 
     object UserRestHandler extends Handler {
-        def getIdFromPath(path: String): Integer = Integer.valueOf(path.split("/").last)
-
-        def isUserPath(path: String): Boolean = {
-            val userPathRegex = "/users/[0-9]+".r
-            userPathRegex.findAllIn(path).hasNext
-        }
-
-        override def canHandle(request: HttpServletRequest): Boolean = {
-            val path = request.getPathInfo
-            isUserPath(path)
-        }
+        override def getPathRegex: Regex = "/users/([0-9]+)".r
 
         override def handle(request: HttpServletRequest, response: HttpServletResponse): Unit = {
             val path = request.getPathInfo
-            val id = getIdFromPath(path)
+            val id = Integer.valueOf(getPathParams(path).head)
+
             val userOption: Option[User] = UserRepository.get(id)
             if (userOption.isEmpty) {
                 throw new RuntimeException("no User by that Id")
@@ -55,6 +65,7 @@ class App extends HttpServlet
                 response.getWriter.print(user.toJSONString)
             }
         }
+
     }
 
     object UserRepository{
