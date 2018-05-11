@@ -2,6 +2,7 @@ package com.cj.dscimeca.onboarding.todo.user
 
 import java.io.{PrintWriter, StringWriter}
 
+import javax.servlet.http.HttpServletResponse
 import org.scalatest.{FunSpec, Matchers}
 
 /**
@@ -9,20 +10,25 @@ import org.scalatest.{FunSpec, Matchers}
   */
 class AppTest extends FunSpec with Matchers {
 
-  def assertIsJSON(result: String): Unit = if (false) throw new RuntimeException("Is not JSON")
-
-  def generateUserGetByIdReqResp(id: Integer): RequestStub = {
-    val id = 1
-    val path = "/users/%d".format(id)
-    return new RequestStub(path)
-  }
-
   describe("App") {
     //given
     val app = new App()
+    describe("routing"){
+      it("should return 404 status when route doesn't exist"){
+        //given
+        val req = new RequestStub("/not-a-real-route")
+        val resp = new ResponseStub()
 
+        //when
+        app.service(req, resp)
+
+        //then
+        val status = resp.getStatus
+        status should equal(HttpServletResponse.SC_NOT_FOUND)
+      }
+    }
     describe("getUserById") {
-      describe("bob smith") {
+      it("bob smith") {
         val req = new RequestStub("/users/1")
         val resp = new ResponseStub()
 
@@ -30,11 +36,9 @@ class AppTest extends FunSpec with Matchers {
         app.service(req, resp)
         val result: String = resp.getBodyInString
 
-        it("should return correct JSON as string") {
-          result should equal("""{id:1,"firstname":"Bob","lastname":"Smith","fullname":"Bob Smith"}""")
-        }
+        result should equal("""{id:1,"firstname":"Bob","lastname":"Smith","fullname":"Bob Smith"}""")
       }
-      describe("john doe smith") {
+      it("john doe smith") {
         val req = new RequestStub("/users/2")
         val resp = new ResponseStub()
 
@@ -42,9 +46,17 @@ class AppTest extends FunSpec with Matchers {
         app.service(req, resp)
         val result: String = resp.getBodyInString
 
-        it("should return correct JSON as string") {
-          result should equal("""{id:2,"firstname":"John","lastname":"Doe","fullname":"John Doe"}""")
-        }
+        result should equal("""{id:2,"firstname":"John","lastname":"Doe","fullname":"John Doe"}""")
+      }
+      it("no id should return 404") {
+        val req = new RequestStub("/users/")
+        val resp = new ResponseStub()
+
+        //when
+        app.service(req, resp)
+
+        //then
+        resp.getStatus should equal(404)
       }
     }
   }
@@ -56,10 +68,15 @@ class AppTest extends FunSpec with Matchers {
   class ResponseStub extends HttpServletResponseImplAbstract {
     val stringWriter: StringWriter = new StringWriter()
     val printWriter: PrintWriter = new PrintWriter(stringWriter)
+    var status = 200
 
     def getBodyInString: String = stringWriter.getBuffer.toString
 
     override def getWriter: PrintWriter = new PrintWriter(printWriter)
+
+    override def setStatus(status: Int): Unit = this.status = status
+
+    override def getStatus: Int = this.status
   }
 
 }
