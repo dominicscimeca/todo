@@ -23,8 +23,8 @@ class AppTest extends FunSpec with Matchers {
         app.service(req, resp)
 
         //then
-        val status = resp.getStatus
-        status should equal(HttpServletResponse.SC_NOT_FOUND)
+        resp.getStatus should equal(HttpServletResponse.SC_NOT_FOUND)
+        resp.getBodyInString should equal("Route \"/not-a-real-route\" does not exist")
       }
     }
     describe("getUserById") {

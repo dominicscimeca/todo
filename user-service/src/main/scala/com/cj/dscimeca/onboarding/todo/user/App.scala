@@ -27,6 +27,7 @@ class App extends HttpServlet
         }
 
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND)
+        resp.getWriter.print(s"""Route "${req.getPathInfo}" does not exist""")
     }
 
     trait Handler{
