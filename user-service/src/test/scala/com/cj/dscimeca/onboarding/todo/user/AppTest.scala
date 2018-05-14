@@ -28,35 +28,30 @@ class AppTest extends FunSpec with Matchers {
       }
     }
     describe("getUserById") {
-      it("bob smith") {
-        val req = new RequestStub("/users/1")
-        val resp = new ResponseStub()
+      it("should return valid user if exists") {
+        val user = User(10, "Steven", "Smith")
 
-        //when
-        app.service(req, resp)
-        val result: String = resp.getBodyInString
-
-        result should equal("""{id:1,"firstname":"Bob","lastname":"Smith","fullname":"Bob Smith"}""")
-      }
-      it("john doe smith") {
-        val req = new RequestStub("/users/2")
-        val resp = new ResponseStub()
-
-        //when
-        app.service(req, resp)
-        val result: String = resp.getBodyInString
-
-        result should equal("""{id:2,"firstname":"John","lastname":"Doe","fullname":"John Doe"}""")
-      }
-      it("no id should return 404") {
-        val req = new RequestStub("/users/")
+        DI.UserRepository = new UserRepositoryStub(Some(user))
+        val req = new RequestStub("/users/10")
         val resp = new ResponseStub()
 
         //when
         app.service(req, resp)
 
         //then
-        resp.getStatus should equal(404)
+        resp.getBodyInString should equal("""{id:10,"firstname":"Steven","lastname":"Smith","fullname":"Steven Smith"}""")
+      }
+      it("should 404 if user does not exist"){
+        DI.UserRepository = new UserRepositoryStub(None)
+        val req = new RequestStub("/users/2")
+        val resp = new ResponseStub()
+
+        //when
+        app.service(req, resp)
+
+        //then
+        resp.getStatus should equal(HttpServletResponse.SC_NOT_FOUND)
+        resp.getBodyInString should equal(s"No existing user with id: 2")
       }
     }
   }
@@ -77,6 +72,10 @@ class AppTest extends FunSpec with Matchers {
     override def setStatus(status: Int): Unit = this.status = status
 
     override def getStatus: Int = this.status
+  }
+
+  class UserRepositoryStub(user: Option[User]) extends UserRepository{
+    override def get(id: Int): Option[User] = user
   }
 
 }

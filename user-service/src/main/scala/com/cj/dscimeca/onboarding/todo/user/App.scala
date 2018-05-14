@@ -5,9 +5,8 @@ import java.io.IOException
 import javax.servlet.ServletException
 import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 
-import scala.collection.mutable
 import scala.util.matching.Regex
-import scala.collection.mutable.ListBuffer
+import scala.util.matching.Regex.Match
 
 /**
  * Hello world!
@@ -40,13 +39,13 @@ class App extends HttpServlet
         }
 
         def pathMatchesPathRegex(path: String): Boolean = getPathRegex.findAllIn(path).hasNext
-        def getPathParams(path: String): List[String] = {
-            var params = new ListBuffer[String]()
-            getPathRegex.findAllIn(path).matchData foreach {
-                m => params += m.group(1)
-            }
 
-            params.toList
+        def getPathParams(path: String): Seq[String] = {
+            val matchData = getPathRegex.findAllIn(path).matchData
+            val extractFirstParam = (aMatch:Match) => aMatch.group(1)
+            val paramIterator = matchData.map(extractFirstParam)
+
+            paramIterator.toSeq
         }
     }
 
@@ -57,32 +56,15 @@ class App extends HttpServlet
             val path = request.getPathInfo
             val id = Integer.valueOf(getPathParams(path).head)
 
-            val userOption: Option[User] = UserRepository.get(id)
+            val userOption: Option[User] = DI.UserRepository.get(id)
             if (userOption.isEmpty) {
-                throw new RuntimeException("no User by that Id")
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND)
+                response.getWriter.print(s"No existing user with id: $id")
             } else {
                 val user: User = userOption.get
                 response.getWriter.print(user.toJSONString)
             }
         }
-
     }
 
-    object UserRepository{
-        private val users = Map(
-            1 -> User(1, "Bob", "Smith"),
-            2 -> User(2, "John", "Doe")
-        )
-
-        def get(id: Int): Option[User] = {
-            users.get(id)
-        }
-    }
-
-    case class User(id: Integer, firstName: String, lastName: String){
-
-        def getFullName: String = "%s %s".format(firstName, lastName)
-
-        def toJSONString: String = s"""{id:$id,"firstname":"$firstName","lastname":"$lastName","fullname":"$getFullName"}"""
-    }
 }
