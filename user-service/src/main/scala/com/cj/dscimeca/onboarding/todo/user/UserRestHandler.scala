@@ -4,7 +4,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import scala.util.matching.Regex
 
-class UserRestHandler(UserRepository: UserRepository) extends Handler {
+class UserRestHandler(UserRepository: UserRepository) extends RestHandler {
   override def getPathRegex: Regex = "/users/([0-9]+)".r
 
   override def handle(request: HttpServletRequest, response: HttpServletResponse): Unit = {

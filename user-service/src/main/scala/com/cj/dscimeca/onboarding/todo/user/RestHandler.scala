@@ -5,7 +5,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import scala.util.matching.Regex
 import scala.util.matching.Regex.Match
 
-trait Handler{
+trait RestHandler{
   def handle(request: HttpServletRequest, response: HttpServletResponse): Unit
   def getPathRegex: Regex
 
