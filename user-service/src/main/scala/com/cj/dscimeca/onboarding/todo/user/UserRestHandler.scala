@@ -9,15 +9,22 @@ class UserRestHandler(UserRepository: UserRepository) extends RestHandler {
 
   override def handle(request: HttpServletRequest, response: HttpServletResponse): Unit = {
     val path = request.getPathInfo
-    val id = Integer.valueOf(getPathParams(path).head)
+    val id = getUserIdFromPath(path)
 
     val userOption: Option[User] = UserRepository.get(id)
-    if (userOption.isEmpty) {
-      response.setStatus(HttpServletResponse.SC_NOT_FOUND)
-      response.getWriter.print(s"No existing user with id: $id")
-    } else {
-      val user: User = userOption.get
-      response.getWriter.print(user.toJSONString)
+
+    userOption match {
+      case Some(user) => response.getWriter.print(user.toJSONString)
+      case None =>
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND)
+        response.getWriter.print(s"No existing user with id: $id")
     }
+  }
+
+  def getUserIdFromPath(path: String): Int = {
+    val pathParams = getPathParams(path)
+    val idString = pathParams.head
+
+    Int(idString)
   }
 }

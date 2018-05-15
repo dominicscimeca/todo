@@ -6,11 +6,9 @@ class RestHandlerManager(handlers: List[RestHandler]) {
   def handle(req: HttpServletRequest, resp: HttpServletResponse): Unit = {
     val handlerOption = findHandler(req)
 
-    if(handlerOption.isDefined){
-      val handler = handlerOption.get
-      handlerFound(handler, req, resp)
-    }else{
-      handlerNotFound(req, resp)
+    handlerOption match {
+      case Some(handler) => handlerFound(handler, req, resp)
+      case None => handlerNotFound(req, resp)
     }
   }
 

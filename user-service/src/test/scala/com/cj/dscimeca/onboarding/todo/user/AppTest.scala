@@ -24,7 +24,7 @@ class AppTest extends FunSpec with Matchers {
 
         //then
         resp.getStatus should equal(HttpServletResponse.SC_NOT_FOUND)
-        resp.getBodyInString should equal("Route \"/not-a-real-route\" does not exist")
+        resp.getBodyAsString should equal("Route \"/not-a-real-route\" does not exist")
       }
     }
     describe("getUserById") {
@@ -39,7 +39,7 @@ class AppTest extends FunSpec with Matchers {
         app.service(req, resp)
 
         //then
-        resp.getBodyInString should equal("""{id:10,"firstname":"Steven","lastname":"Smith","fullname":"Steven Smith"}""")
+        resp.getBodyAsString should equal("""{id:10,"firstname":"Steven","lastname":"Smith","fullname":"Steven Smith"}""")
       }
       it("should 404 if user does not exist"){
         DI.UserRepository = new UserRepositoryStub(None)
@@ -51,7 +51,7 @@ class AppTest extends FunSpec with Matchers {
 
         //then
         resp.getStatus should equal(HttpServletResponse.SC_NOT_FOUND)
-        resp.getBodyInString should equal(s"No existing user with id: 2")
+        resp.getBodyAsString should equal(s"No existing user with id: 2")
       }
     }
   }
@@ -65,7 +65,7 @@ class AppTest extends FunSpec with Matchers {
     val printWriter: PrintWriter = new PrintWriter(stringWriter)
     var status = 200
 
-    def getBodyInString: String = stringWriter.getBuffer.toString
+    def getBodyAsString: String = stringWriter.getBuffer.toString
 
     override def getWriter: PrintWriter = new PrintWriter(printWriter)
 
