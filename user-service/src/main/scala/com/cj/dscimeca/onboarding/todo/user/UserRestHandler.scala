@@ -11,7 +11,7 @@ class UserRestHandler(UserRepository: UserRepository) extends RestHandler {
     val path = request.getPathInfo
     val id = getUserIdFromPath(path)
 
-    val userOption: Option[User] = UserRepository.get(id)
+    val userOption: Option[User] = DI.UserRepository.get(id)
 
     userOption match {
       case Some(user) => response.getWriter.print(user.toJSONString)
