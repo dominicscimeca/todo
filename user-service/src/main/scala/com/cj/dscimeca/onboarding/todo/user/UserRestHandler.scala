@@ -25,6 +25,6 @@ class UserRestHandler(UserRepository: UserRepository) extends RestHandler {
     val pathParams = getPathParams(path)
     val idString = pathParams.head
 
-    Int(idString)
+    idString.toInt
   }
 }
