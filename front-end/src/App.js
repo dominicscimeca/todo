@@ -1,21 +1,25 @@
-import React, { Component } from 'react';
+import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import {connect} from 'react-redux'
+import UserManagement from './UserManagement'
 
-class App extends Component {
-  render() {
+function App(props){
     return (
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">{props.title}</h1>
         </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <div className="App-intro">
+          Get User from backend
+            <UserManagement></UserManagement>
+        </div>
       </div>
     );
-  }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return { title: state.title }
+};
+export default connect(mapStateToProps)(App);
