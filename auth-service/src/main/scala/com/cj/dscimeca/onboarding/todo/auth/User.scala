@@ -1,4 +1,4 @@
-package com.cj.dscimeca.onboarding.todo.user
+package com.cj.dscimeca.onboarding.todo.auth
 
 case class User (id: Integer, firstName: String, lastName: String){
 

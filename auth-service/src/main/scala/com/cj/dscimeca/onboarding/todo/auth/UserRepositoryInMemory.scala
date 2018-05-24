@@ -1,4 +1,4 @@
-package com.cj.dscimeca.onboarding.todo.user
+package com.cj.dscimeca.onboarding.todo.auth
 
 object UserRepositoryInMemory extends UserRepository {
   private val users = Map(
