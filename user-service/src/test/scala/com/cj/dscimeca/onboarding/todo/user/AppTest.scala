@@ -26,6 +26,17 @@ class AppTest extends FunSpec with Matchers {
         resp.getStatus should equal(HttpServletResponse.SC_NOT_FOUND)
         resp.getBodyAsString should equal("Route \"/not-a-real-route\" does not exist")
       }
+      it("should return a access-control-allow-origin header for *"){
+        //given
+        val req = new RequestStub("/not-a-real-route")
+        val resp = new ResponseStub()
+
+        //when
+        app.service(req, resp)
+
+        //then
+        resp.getHeader("Access-Control-Allow-Origin") should equal("*")
+      }
     }
     describe("getUserById") {
       it("should return valid user if exists") {
@@ -64,6 +75,7 @@ class AppTest extends FunSpec with Matchers {
     val stringWriter: StringWriter = new StringWriter()
     val printWriter: PrintWriter = new PrintWriter(stringWriter)
     var status = 200
+    var headers: Map[String, String] = Map()
 
     def getBodyAsString: String = stringWriter.getBuffer.toString
 
@@ -72,6 +84,10 @@ class AppTest extends FunSpec with Matchers {
     override def setStatus(status: Int): Unit = this.status = status
 
     override def getStatus: Int = this.status
+
+    override def getHeader(s: String): String = this.headers(s)
+
+    override def setHeader(s: String, s1: String): Unit = this.headers += s -> s1
   }
 
   class UserRepositoryStub(user: Option[User]) extends UserRepository{
