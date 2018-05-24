@@ -1,3 +1,3 @@
 export default {
-    title: "Coming from Redux!!!"
+    title: "Coming from Redux!!! #2"
 }

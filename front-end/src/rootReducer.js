@@ -1,8 +1,14 @@
-import {userReducer} from "./UserManagement"
-import {titleReducer} from "./TitleManagement"
+import {userReducer as user} from "./UserManagement"
+import {tokenReducer as token} from "./Login";
+import {titleReducer as title} from "./Header";
+
+import { routerReducer as router } from 'react-router-redux'
 
 import {combineReducers} from 'redux'
+
 export default combineReducers({
-    user: userReducer,
-    title: titleReducer
+    user,
+    title,
+    token,
+    router
 })

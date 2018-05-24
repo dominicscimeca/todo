@@ -1,19 +1,19 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import {connect} from 'react-redux'
-import UserManagement from './UserManagement'
+import {Route} from 'react-router-dom'
+import Login from './Login'
+import Header from './Header'
+
+export const HOME_URL = '/';
+export const LOGIN_URL = '/login';
 
 function App(props){
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">{props.title}</h1>
-        </header>
+        <Header/>
         <div className="App-intro">
-          Get User from backend
-            <UserManagement></UserManagement>
+            <Route exact path="/login" component={Login} />
         </div>
       </div>
     );

@@ -1,30 +1,43 @@
 import React from "react"
 import {connect} from 'react-redux'
-let input = React.createRef();
+import {Redirect, Link} from 'react-router-dom'
+import {LOGIN_URL} from "./App";
+import {logOut, LOGOUT} from "./Login";
 
-const UserManagement = ({user, getUser}) => {
-    let userDescription = "";
-
-    if(user.firstname){
-        userDescription = `${user.firstname} ${user.lastname}`
-    }else if (user.loading) {
-        userDescription = "Loading...."
-    }else if (user.err) {
-        userDescription = "Error: User not found";
-    }else{
-        userDescription = "Click to load"
+const UserManagement = ({user, getUser, isAuthenticated, logOut, token, location}) => {
+    console.log(isAuthenticated, location);
+    if(!isAuthenticated && 'undefined' !== typeof location && location !== LOGIN_URL){
+        return (
+            <Redirect to={LOGIN_URL} />
+        );
     }
 
-    return (
-        <div>
-            <form onSubmit={getUser}>
-                <div>Find User</div>
-                <input type="text" ref={input}/>
-                <input type="submit"/>
-            </form>
-            <div>User: {userDescription}</div>
-        </div>
-    );
+    if(user.firstname){
+        return (
+            <div>
+                Welcome {user.firstname} {user.lastname}! <button onClick={logOut}>Log out</button>
+            </div>
+        );
+    }else if (user.err) {
+        return (
+            <div style={{color:"red"}}>
+                Error User Not Found ...
+            </div>
+        );
+    }else if(user.loading) {
+        return (
+            <div>
+                Loading ...
+            </div>
+        );
+    }else{
+        if(token) {
+            getUser(token);
+        }
+        return (
+            <Link to={LOGIN_URL}>Login</Link>
+        );
+    }
 };
 
 const GET_USER_REQUEST = "GET_USER_REQUEST";
@@ -77,6 +90,8 @@ export const userReducer = (user = {}, action) => {
             return {err: action.err.message};
         case GET_USER_REQUEST:
             return {...user, loading: true};
+        case LOGOUT:
+            return {};
         default:
             return user;
     }
@@ -84,16 +99,17 @@ export const userReducer = (user = {}, action) => {
 
 const mapStateToProps = state => {
     return {
-        user: state.user
+        user: state.user,
+        isAuthenticated: state.token,
+        token: state.token,
+        location: state.router.location.path
     }
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        getUser: (e) => {
-            e.preventDefault();
-            dispatch(getUser(input.current.value))
-        }
+        getUser: id => dispatch(getUser(id)),
+        logOut: () => dispatch(logOut())
     };
 };
 
