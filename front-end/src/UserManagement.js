@@ -1,27 +1,40 @@
 import React from "react"
 import {connect} from 'react-redux'
+let input = React.createRef();
 
-function UserManagement(props){
-    let input;
+const UserManagement = ({user, getUser}) => {
+    let userDescription = "";
+
+    if(user.firstname){
+        userDescription = `${user.firstname} ${user.lastname}`
+    }else if (user.loading){
+        userDescription = "Loading...."
+    }else{
+        userDescription = "Click to load"
+    }
+
     return (
         <div>
-            <form action="">
+            <form onSubmit={getUser}>
                 <div>Find User</div>
                 <input type="text" ref={input}/>
+                <input type="submit"/>
             </form>
-            <button onClick={props.getUser}>Click to get User</button>
-            { props.user.firstname ? (
-                <div>User: {props.user.firstname} {props.user.lastname}</div>
-            ) : (
-                <div>Load user</div>
-            ) }
+            <div>User: {userDescription}</div>
         </div>
     );
-}
+};
 
 const GET_USER_REQUEST = "GET_USER_REQUEST";
 const GET_USER_SUCCESS = "GET_USER_SUCCESS";
 const GET_USER_FAILURE = "GET_USER_FAILURE";
+
+const userRequest = (userId) => {
+    return {
+        type: GET_USER_REQUEST,
+        userId: userId
+    }
+};
 
 const userSuccess = (user) => {
     return {
@@ -29,6 +42,7 @@ const userSuccess = (user) => {
         user: user
     }
 };
+
 const userFailure = (err) => {
     return {
         type: GET_USER_FAILURE,
@@ -36,11 +50,13 @@ const userFailure = (err) => {
 }
 };
 
-const getUser = () => {
+const getUser = (userId) => {
     return (dispatch) => {
-        fetch("http://localhost:8080/users/1")
+        dispatch(userRequest(userId));
+        fetch("http://localhost:8080/users/"+userId)
+            .then(data => data.json())
             .then(user => dispatch(userSuccess(user)))
-            .catch(err => userFailure(err))
+            .catch(err => dispatch(userFailure(err)))
     }
 };
 
@@ -60,7 +76,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        getUser: () => dispatch(getUser())
+        getUser: (e) => {
+            e.preventDefault();
+            dispatch(getUser(input.current.value))
+        }
     };
 };
 

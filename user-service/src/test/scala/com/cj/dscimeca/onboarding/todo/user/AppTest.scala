@@ -50,7 +50,7 @@ class AppTest extends FunSpec with Matchers {
         app.service(req, resp)
 
         //then
-        resp.getBodyAsString should equal("""{id:10,"firstname":"Steven","lastname":"Smith","fullname":"Steven Smith"}""")
+        resp.getBodyAsString should equal("""{"id":10,"firstname":"Steven","lastname":"Smith","fullname":"Steven Smith"}""")
       }
       it("should 404 if user does not exist"){
         DI.UserRepository = new UserRepositoryStub(None)
