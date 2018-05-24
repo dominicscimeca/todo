@@ -3,10 +3,10 @@ import {connect} from 'react-redux'
 import {Redirect, Link} from 'react-router-dom'
 import {LOGIN_URL} from "./App";
 import {logOut, LOGOUT} from "./Login";
+import { push } from 'react-router-redux'
 
-const UserManagement = ({user, getUser, isAuthenticated, logOut, token, location}) => {
-    console.log(isAuthenticated, location);
-    if(!isAuthenticated && 'undefined' !== typeof location && location !== LOGIN_URL){
+const UserManagement = ({user, getUser, isAuthenticated, logOut, token}) => {
+    if(!isAuthenticated){
         return (
             <Redirect to={LOGIN_URL} />
         );
@@ -101,15 +101,15 @@ const mapStateToProps = state => {
     return {
         user: state.user,
         isAuthenticated: state.token,
-        token: state.token,
-        location: state.router.location.path
+        token: state.token
     }
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         getUser: id => dispatch(getUser(id)),
-        logOut: () => dispatch(logOut())
+        logOut: () => dispatch(logOut()),
+        redirectToLogin: () => dispatch(push(LOGIN_URL))
     };
 };
 

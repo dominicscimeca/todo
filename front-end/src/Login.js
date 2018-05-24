@@ -6,8 +6,7 @@ import {HOME_URL} from "./App";
 let usernameInput = React.createRef();
 let passwordInput = React.createRef();
 
-const Login = ({submitLogin, isAuthenticated, location}) => {
-
+const Login = ({submitLogin, isAuthenticated}) => {
     if(isAuthenticated){
         return (
             <Redirect to={HOME_URL} />
@@ -76,4 +75,3 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login)
-// export default Login
