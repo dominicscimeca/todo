@@ -1,7 +1,7 @@
 <web-app>
     <servlet>
         <servlet-name>app</servlet-name>
-        <servlet-class>com.cj.dscimeca.onboarding.todo.user.App</servlet-class>
+        <servlet-class>com.cj.dscimeca.onboarding.todo.auth.App</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>app</servlet-name>

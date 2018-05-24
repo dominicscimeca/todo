@@ -74,7 +74,7 @@ const handleErrors = (response) => {
 const getUser = (userId) => {
     return (dispatch) => {
         dispatch(userRequest(userId));
-        fetch("http://localhost:8080/users/"+userId)
+        fetch("http://localhost:8081/users/"+userId)
             .then(handleErrors)
             .then(data => data.json())
             .then(user => dispatch(userSuccess(user)))
