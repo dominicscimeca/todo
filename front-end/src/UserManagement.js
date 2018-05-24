@@ -7,8 +7,10 @@ const UserManagement = ({user, getUser}) => {
 
     if(user.firstname){
         userDescription = `${user.firstname} ${user.lastname}`
-    }else if (user.loading){
+    }else if (user.loading) {
         userDescription = "Loading...."
+    }else if (user.err) {
+        userDescription = "Error: User not found";
     }else{
         userDescription = "Click to load"
     }
@@ -49,11 +51,18 @@ const userFailure = (err) => {
         err: err
 }
 };
+const handleErrors = (response) => {
+    if (!response.ok) {
+        throw new Error(response.statusText);
+    }
+    return response;
+};
 
 const getUser = (userId) => {
     return (dispatch) => {
         dispatch(userRequest(userId));
         fetch("http://localhost:8080/users/"+userId)
+            .then(handleErrors)
             .then(data => data.json())
             .then(user => dispatch(userSuccess(user)))
             .catch(err => dispatch(userFailure(err)))
@@ -61,10 +70,15 @@ const getUser = (userId) => {
 };
 
 export const userReducer = (user = {}, action) => {
-    if(action.type === GET_USER_SUCCESS){
-        return action.user
-    }else{
-        return user;
+    switch(action.type){
+        case GET_USER_SUCCESS:
+            return action.user;
+        case GET_USER_FAILURE:
+            return {err: action.err.message};
+        case GET_USER_REQUEST:
+            return {...user, loading: true};
+        default:
+            return user;
     }
 };
 
