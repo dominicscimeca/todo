@@ -1,9 +1,11 @@
 package com.cj.dscimeca.onboarding.todo.auth
 
 object DI{
-  var UserRepository:UserRepository = UserRepositoryInMemory
+  var CredentialsRepository:CredentialsRepository = CredentialsRepositoryInMemory
 
-  private val restHandlers: List[RestHandler] = List(new UserRestHandler(UserRepository))
+  var CredentialsService:CredentialsService = new CredentialsService(CredentialsRepository)
+
+  private val restHandlers: List[RestHandler] = List(new UserRestHandler(CredentialsService))
 
   val RestHandlerManager: RestHandlerManager = new RestHandlerManager(restHandlers)
 

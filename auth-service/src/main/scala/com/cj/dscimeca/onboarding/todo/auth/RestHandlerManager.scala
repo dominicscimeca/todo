@@ -15,7 +15,7 @@ class RestHandlerManager(handlers: List[RestHandler]) {
     }
   }
 
-  def addHeadersToResponse(resp: HttpServletResponse) = resp.setHeader("Access-Control-Allow-Origin","*")
+  def addHeadersToResponse(resp: HttpServletResponse): Unit = resp.setHeader("Access-Control-Allow-Origin","*")
 
   def findHandler(request: HttpServletRequest): Option[RestHandler] = {
     handlers.find(_.canHandle(request))

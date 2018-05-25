@@ -1,30 +1,33 @@
 package com.cj.dscimeca.onboarding.todo.auth
 
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import java.util.stream.Collectors
 
 import scala.util.matching.Regex
 
-class UserRestHandler(UserRepository: UserRepository) extends RestHandler {
-  override def getPathRegex: Regex = "/users/([0-9]+)".r
+class UserRestHandler(credentialsService: CredentialsService) extends RestHandler {
+  override def getPathRegex: Regex = "/auth".r
+
+  def respondWithJWT(response: HttpServletResponse) = ???
+
+  def responseWith404(response: HttpServletResponse) = ???
 
   override def handle(request: HttpServletRequest, response: HttpServletResponse): Unit = {
     val path = request.getPathInfo
-    val id = getUserIdFromPath(path)
 
-    val userOption: Option[User] = DI.UserRepository.get(id)
+    val body = request.getReader.lines.collect(Collectors.joining(System.lineSeparator))
+    val (username, password) = getUsernameAndPasswordFromBody(body)
 
-    userOption match {
-      case Some(user) => response.getWriter.print(user.toJSONString)
-      case None =>
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND)
-        response.getWriter.print(s"No existing user with id: $id")
+    val isCredentialsValid = credentialsService.isCredentialsValid(username, password)
+
+    if(isCredentialsValid){
+      respondWithJWT(response)
+    }else{
+      responseWith404(response)
     }
   }
 
-  def getUserIdFromPath(path: String): Int = {
-    val pathParams = getPathParams(path)
-    val idString = pathParams.head
-
-    idString.toInt
+  def getUsernameAndPasswordFromBody(body: String): (String, String) = {
+    ("bobsmith", "test1234")
   }
 }

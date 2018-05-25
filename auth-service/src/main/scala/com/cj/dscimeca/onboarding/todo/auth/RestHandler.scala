@@ -23,4 +23,8 @@ trait RestHandler{
 
     paramIterator.toSeq
   }
+
+  def getBodyJSONAsMap(body: String): Map[String, String] = {
+      Map()
+  }
 }
